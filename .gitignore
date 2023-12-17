@@ -1,4 +1,4 @@
 parent/
 python/.idea
-c++/.idea
-c++/cmake-build-debug
+.idea*
+.cmake-build-debug

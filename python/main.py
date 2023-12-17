@@ -1,102 +1,113 @@
-from tkinter import *
+import sys
+from PyQt6.QtWidgets import QWidget, QApplication, QLabel, QLineEdit, QPushButton, QGridLayout, QComboBox, QMessageBox
 from functions import *
 
-choice_1 = ''
-choice_2 = ''
 
+class Window(QWidget):
+    result: QLabel
+    num1: QLineEdit
+    num2: QLineEdit
+    type1: QComboBox
+    type2: QComboBox
+    button: QPushButton
+    layout: QGridLayout
+    types: list[str] = ['2', '8', '10', '16']
 
-def create_window() -> Tk:
-    def on_select_list_1(event):
-        if list_1.curselection():
-            global choice_1
-            choice_1 = list_1.get(list_1.curselection())
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Numeral System transformation')
+        self.setGeometry(100, 100, 500, 500)
 
-    def on_select_list_2(event):
-        if list_2.curselection():
-            global choice_2
-            choice_2 = list_2.get(list_2.curselection())
+        # creating objects
+        self.result = QLabel()
+        self.num1 = QLineEdit()
+        self.num2 = QLineEdit()
+        self.type1 = QComboBox()
+        self.type2 = QComboBox()
+        self.button = QPushButton("Transform")
+        self.layout = QGridLayout()
 
-    def transform() -> None:
-        num = ent.get()
-        match choice_1:
-            case 'binary':
-                if is_binary(num):
-                    match choice_2:
-                        case 'octal':
-                            lb.config(text=binary_to_octal(num))
-                        case 'decimal':
-                            lb.config(text=binary_to_decimal(num))
-                        case 'hexadecimal':
-                            lb.config(text=binary_to_hexadecimal(num))
+        # adding the types to the ComboBoxes
+        for t in self.types:
+            self.type1.addItem(t)
+            self.type2.addItem(t)
+
+        # connecting button to function
+        self.button.clicked.connect(self.on_transform_pressed)
+
+        # adding the objects to the window
+        self.layout.addWidget(self.num1, 0, 0)
+        self.layout.addWidget(self.type1, 1, 0)
+
+        self.layout.addWidget(self.num2, 0, 2)
+        self.layout.addWidget(self.type2, 1, 2)
+
+        self.layout.addWidget(self.button, 0, 1)
+        self.layout.addWidget(self.result, 1, 1)
+
+        self.setLayout(self.layout)
+
+    # function that will be activated when the button is pressed
+    def on_transform_pressed(self):
+        # getting the selected types
+        type1 = self.type1.currentText()
+        type2 = self.type2.currentText()
+
+        # getting the inputed number
+        num1 = self.num1.text()
+
+        if type1 == '2':
+            if is_binary(num1):
+                if type2 == '8':
+                    self.result.setText(binary_to_octal(num1))
+                elif type2 == '10':
+                    self.result.setText(binary_to_decimal(num1))
+                elif type2 == '16':
+                    self.result.setText(binary_to_hexadecimal(num1))
                 else:
-                    lb.config(text="Enter a valid input")
-            case 'octal':
-                if is_octal(num):
-                    match choice_2:
-                        case 'binary':
-                            lb.config(text=octal_to_binary(num))
-                        case 'decimal':
-                            lb.config(text=octal_to_decimal(num))
-                        case 'hexadecimal':
-                            lb.config(text=octal_to_hexadecimal(num))
+                    QMessageBox.information(self, "Error", "Invalid type")
+            else:
+                QMessageBox.information(self, "Error", "Ivalid number")
+        elif type1 == '8':
+            if is_binary(num1):
+                if type2 == '2':
+                    self.result.setText(octal_to_binary(num1))
+                elif type2 == '10':
+                    self.result.setText(octal_to_decimal(num1))
+                elif type2 == '16':
+                    self.result.setText(octal_to_hexadecimal(num1))
                 else:
-                    lb.config(text="Enter a valid input")
-            case 'decimal':
-                if is_decimal(num):
-                    match choice_2:
-                        case 'binary':
-                            lb.config(text=decimal_to_binary(num))
-                        case 'octal':
-                            lb.config(text=decimal_to_octal(num))
-                        case 'hexadecimal':
-                            lb.config(text=decimal_to_hexadecimal(num))
+                    QMessageBox.information(self, "Error", "Invalid type")
+            else:
+                QMessageBox.information(self, "Error", "Invalid number")
+        elif type1 == '10':
+            if is_decimal(num1):
+                if type2 == '2':
+                    self.result.setText(decimal_to_binary(num1))
+                elif type2 == '8':
+                    self.result.setText(decimal_to_octal(num1))
+                elif type2 == '16':
+                    self.result.setText(decimal_to_hexadecimal(num1))
                 else:
-                    lb.config(text="Enter a valid input")
-            case 'hexadecimal':
-                if is_hexadecimal(num):
-                    match choice_2:
-                        case 'binary':
-                            lb.config(text=hexadecimal_to_binary(num))
-                        case 'octal':
-                            lb.config(text=hexadecimal_to_octal(num))
-                        case 'decimal':
-                            lb.config(text=hexadecimal_to_decimal(num))
+                    QMessageBox.information(self, "Error", "Invalid type")
+            else:
+                QMessageBox.information(self, "Error", "Invalid number")
+        elif type1 == '16':
+            if is_binary(num1):
+                if type2 == '2':
+                    self.result.setText(hexadecimal_to_binary(num1))
+                elif type2 == '8':
+                    self.result.setText(hexadecimal_to_octal(num1))
+                elif type2 == '10':
+                    self.result.setText(hexadecimal_to_decimal(num1))
                 else:
-                    lb.config(text="Enter a valid input")
-
-    wnd = Tk()
-    wnd.geometry("1000x500")
-    wnd.title("Numeral system transformation")
-
-    ent = Entry(wnd)
-    ent.grid(row=0, column=0, pady=10, padx=10, sticky="nw")
-
-    lb = Label(wnd, text="")
-    lb.grid(row=0, column=3, pady=10, padx=10, sticky="ne")
-
-    options = ['decimal', 'hexadecimal', 'binary', 'octal']
-    list_1 = Listbox(wnd, selectmode=SINGLE)
-    list_1.grid(row=1, column=0, padx=10, pady=10, sticky="nw")
-    list_1.bind("<<ListboxSelect>>", on_select_list_1)
-
-    list_2 = Listbox(wnd, selectmode=SINGLE)
-    list_2.grid(row=1, column=3, padx=10, pady=10, sticky="ne")
-    list_2.bind("<<ListboxSelect>>", on_select_list_2)
-
-    btn = Button(wnd, text="Transform", command=transform)
-    btn.grid(row=2, column=1, pady=10, padx=10, sticky="nsew")
-
-    for item in options:
-        list_1.insert(END, item)
-        list_2.insert(END, item)
-
-    return wnd
+                    QMessageBox.information(self, "Error", "Invalid type")
+            else:
+                QMessageBox.warning(self, "Error", "Invalid number")
 
 
-def main() -> None:
-    wnd = create_window()
-    wnd.mainloop()
-
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = Window()
+    window.show()
+    sys.exit(app.exec())
